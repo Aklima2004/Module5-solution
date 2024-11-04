@@ -1,6 +1,6 @@
-$(function () { // То же самое, что и document.addEventListener("DOMContentLoaded"...
-  
-  // То же самое, что и document.querySelector("#navbarToggle").addEventListener("blur",...
+$(function () { // Same as document.addEventListener("DOMContentLoaded"...
+
+  // Same as document.querySelector("#navbarToggle").addEventListener("blur",...
   $("#navbarToggle").blur(function (event) {
     var screenWidth = window.innerWidth;
     if (screenWidth < 768) {
@@ -23,20 +23,21 @@ var menuItemsUrl =
 var menuItemsTitleHtml = "snippets/menu-items-title.html";
 var menuItemHtml = "snippets/menu-item.html";
 
-// Вспомогательная функция для вставки innerHTML для 'selector'
+// Convenience function for inserting innerHTML for 'select'
 var insertHtml = function (selector, html) {
   var targetElem = document.querySelector(selector);
   targetElem.innerHTML = html;
 };
 
-// Показать значок загрузки в элементе, идентифицированном 'selector'.
+// Show loading icon inside element identified by 'selector'.
 var showLoading = function (selector) {
   var html = "<div class='text-center'>";
   html += "<img src='images/ajax-loader.gif'></div>";
   insertHtml(selector, html);
 };
 
-// Возвращает замену '{{propName}}' на propValue в строке
+// Return substitute of '{{propName}}'
+// with propValue in given 'string'
 var insertProperty = function (string, propName, propValue) {
   var propToReplace = "{{" + propName + "}}";
   string = string
@@ -44,14 +45,14 @@ var insertProperty = function (string, propName, propValue) {
   return string;
 };
 
-// Убирает класс 'active' с кнопки Home и добавляет его на кнопку Menu
+// Remove the class 'active' from home and switch to Menu button
 var switchMenuToActive = function () {
-  // Убираем 'active' с кнопки Home
+  // Remove 'active' from home button
   var classes = document.querySelector("#navHomeButton").className;
   classes = classes.replace(new RegExp("active", "g"), "");
   document.querySelector("#navHomeButton").className = classes;
 
-  // Добавляем 'active' на кнопку Menu, если ее там нет
+  // Add 'active' to menu button if not already there
   classes = document.querySelector("#navMenuButton").className;
   if (classes.indexOf("active") === -1) {
     classes += " active";
@@ -59,50 +60,95 @@ var switchMenuToActive = function () {
   }
 };
 
-// При загрузке страницы (до загрузки изображений или CSS)
+// On page load (before images or CSS)
 document.addEventListener("DOMContentLoaded", function (event) {
 
-  // На первой загрузке показываем домашнюю страницу
-  showLoading("#main-content");
-  $ajaxUtils.sendGetRequest(
-    allCategoriesUrl,
-    buildAndShowHomeHTML, // Здесь вызываем buildAndShowHomeHTML
-    true); // Устанавливаем флаг для получения JSON с сервера
-});
+// TODO: STEP 0: Look over the code from
+// *** start ***
+// to
+// *** finish ***
+// below.
+// We changed this code to retrieve all categories from the server instead of
+// simply requesting home HTML snippet. We now also have another function
+// called buildAndShowHomeHTML that will receive all the categories from the server
+// and process them: choose random category, retrieve home HTML snippet, insert that
+// random category into the home HTML snippet, and then insert that snippet into our
+// main page (index.html).
+//
+// TODO: STEP 1: Substitute [...] below with the *value* of the function buildAndShowHomeHTML,
+// so it can be called when server responds with the categories data.
 
-// Построить HTML для домашней страницы на основе массива категорий,
-// возвращенного сервером.
-function buildAndShowHomeHTML (categories) {
+// *** start ***
+// On first load, show home view
+showLoading("#main-content");
+$ajaxUtils.sendGetRequest(
+  allCategoriesUrl,
+  buildAndShowHomeHTML,  // <---- Заменяем [...] на buildAndShowHomeHTML
+  true
+);
 
-  // Загружаем HTML-шаблон для домашней страницы
+  function buildAndShowHomeHTML(categories) {
+
+  // Load home snippet page
   $ajaxUtils.sendGetRequest(
     homeHtmlUrl,
     function (homeHtml) {
-      
-      // Шаг 2: Выбираем случайную категорию и сохраняем ее короткое имя
+
+      // TODO: STEP 2: Выбираем случайную категорию из списка
       var chosenCategory = chooseRandomCategory(categories);
-      var chosenCategoryShortName = chosenCategory.short_name;
+      var chosenCategoryShortName = "'" + chosenCategory.short_name + "'";  // Окружили кавычками для корректного вызова
 
-      // Шаг 3: Заменяем {{randomCategoryShortName}} на случайную категорию
-      var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, "randomCategoryShortName", "'" + chosenCategoryShortName + "'");
+      // TODO: STEP 3: Заменяем {{randomCategoryShortName}} в HTML
+      var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, "randomCategoryShortName", chosenCategoryShortName);
 
-      // Шаг 4: Вставляем обновленный HTML на главную страницу
+      // TODO: STEP 4: Вставляем измененный HTML на главную страницу
       insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
-
     },
-    false); // False здесь, так как получаем обычный HTML (не JSON).
+    false
+  );
 }
 
-// Данная функция принимает массив объектов категорий и возвращает случайную категорию
+      // TODO: STEP 2: Here, call chooseRandomCategory, passing it retrieved 'categories'
+      // Pay attention to what type of data that function returns vs what the chosenCategoryShortName
+      // variable's name implies it expects.
+      // var chosenCategoryShortName = ....
+
+
+      // TODO: STEP 3: Substitute {{randomCategoryShortName}} in the home html snippet with the
+      // chosen category from STEP 2. Use existing insertProperty function for that purpose.
+      // Look through this code for an example of how to do use the insertProperty function.
+      // WARNING! You are inserting something that will have to result in a valid Javascript
+      // syntax because the substitution of {{randomCategoryShortName}} becomes an argument
+      // being passed into the $dc.loadMenuItems function. Think about what that argument needs
+      // to look like. For example, a valid call would look something like this:
+      // $dc.loadMenuItems('L')
+      // Hint: you need to surround the chosen category short name with something before inserting
+      // it into the home html snippet.
+      //
+      // var homeHtmlToInsertIntoMainPage = ....
+
+
+      // TODO: STEP 4: Insert the produced HTML in STEP 3 into the main page
+      // Use the existing insertHtml function for that purpose. Look through this code for an example
+      // of how to do that.
+      // ....
+
+    },
+    false); // False here because we are getting just regular HTML from the server, so no need to process JSON.
+}
+
+
+// Given array of category objects, returns a random category object.
 function chooseRandomCategory (categories) {
-  // Выбираем случайный индекс в массиве
+  // Choose a random index into the array (from 0 inclusively until array length (exclusively))
   var randomArrayIndex = Math.floor(Math.random() * categories.length);
 
-  // Возвращаем категорию с этим индексом
+  // return category object with that randomArrayIndex
   return categories[randomArrayIndex];
 }
 
-// Загрузка представления категорий меню
+
+// Load the menu categories view
 dc.loadMenuCategories = function () {
   showLoading("#main-content");
   $ajaxUtils.sendGetRequest(
@@ -110,8 +156,9 @@ dc.loadMenuCategories = function () {
     buildAndShowCategoriesHTML);
 };
 
-// Загрузка представления пунктов меню
-// 'categoryShort' - это сокращенное название категории
+
+// Load the menu items view
+// 'categoryShort' is a short_name for a category
 dc.loadMenuItems = function (categoryShort) {
   showLoading("#main-content");
   $ajaxUtils.sendGetRequest(
@@ -119,18 +166,19 @@ dc.loadMenuItems = function (categoryShort) {
     buildAndShowMenuItemsHTML);
 };
 
-// Построить HTML для страницы категорий на основе данных
-// с сервера
+
+// Builds HTML for the categories page based on the data
+// from the server
 function buildAndShowCategoriesHTML (categories) {
-  // Загружаем HTML-шаблон заголовка страницы категорий
+  // Load title snippet of categories page
   $ajaxUtils.sendGetRequest(
     categoriesTitleHtml,
     function (categoriesTitleHtml) {
-      // Загружаем HTML-шаблон одной категории
+      // Retrieve single category snippet
       $ajaxUtils.sendGetRequest(
         categoryHtml,
         function (categoryHtml) {
-          // Переключаем CSS класс active на кнопку меню
+          // Switch CSS class active to menu button
           switchMenuToActive();
 
           var categoriesViewHtml =
@@ -144,8 +192,9 @@ function buildAndShowCategoriesHTML (categories) {
     false);
 }
 
-// Используем данные о категориях и HTML-шаблоны
-// для построения представления категорий, которое вставляем на страницу
+
+// Using categories data and snippets html
+// build categories view HTML to be inserted into page
 function buildCategoriesViewHtml(categories,
                                  categoriesTitleHtml,
                                  categoryHtml) {
@@ -153,9 +202,9 @@ function buildCategoriesViewHtml(categories,
   var finalHtml = categoriesTitleHtml;
   finalHtml += "<section class='row'>";
 
-  // Цикл по всем категориям
+  // Loop over categories
   for (var i = 0; i < categories.length; i++) {
-    // Вставляем значения категории
+    // Insert category values
     var html = categoryHtml;
     var name = "" + categories[i].name;
     var short_name = categories[i].short_name;
@@ -172,18 +221,20 @@ function buildCategoriesViewHtml(categories,
   return finalHtml;
 }
 
-// Построить HTML для страницы одной категории на основе данных
-// с сервера
+
+
+// Builds HTML for the single category page based on the data
+// from the server
 function buildAndShowMenuItemsHTML (categoryMenuItems) {
-  // Загружаем HTML-шаблон заголовка страницы пунктов меню
+  // Load title snippet of menu items page
   $ajaxUtils.sendGetRequest(
     menuItemsTitleHtml,
     function (menuItemsTitleHtml) {
-      // Загружаем HTML-шаблон одного пункта меню
+      // Retrieve single menu item snippet
       $ajaxUtils.sendGetRequest(
         menuItemHtml,
         function (menuItemHtml) {
-          // Переключаем CSS класс active на кнопку меню
+          // Switch CSS class active to menu button
           switchMenuToActive();
 
           var menuItemsViewHtml =
@@ -197,8 +248,9 @@ function buildAndShowMenuItemsHTML (categoryMenuItems) {
     false);
 }
 
-// Используем данные о категории и пунктах меню, а также HTML-шаблоны
-// для построения представления пунктов меню, которое вставляем на страницу
+
+// Using category and menu items data and snippets html
+// build menu items view HTML to be inserted into page
 function buildMenuItemsViewHtml(categoryMenuItems,
                                 menuItemsTitleHtml,
                                 menuItemHtml) {
@@ -215,11 +267,11 @@ function buildMenuItemsViewHtml(categoryMenuItems,
   var finalHtml = menuItemsTitleHtml;
   finalHtml += "<section class='row'>";
 
-  // Цикл по всем пунктам меню
+  // Loop over menu items
   var menuItems = categoryMenuItems.menu_items;
   var catShortName = categoryMenuItems.category.short_name;
   for (var i = 0; i < menuItems.length; i++) {
-    // Вставляем значения пункта меню
+    // Insert menu item values
     var html = menuItemHtml;
     html =
       insertProperty(html, "short_name", menuItems[i].short_name);
@@ -252,7 +304,7 @@ function buildMenuItemsViewHtml(categoryMenuItems,
                      "description",
                      menuItems[i].description);
 
-    // Добавляем clearfix после каждого второго пункта меню
+    // Add clearfix after every second menu item
     if (i % 2 !== 0) {
       html +=
         "<div class='clearfix visible-lg-block visible-md-block'></div>";
@@ -265,11 +317,12 @@ function buildMenuItemsViewHtml(categoryMenuItems,
   return finalHtml;
 }
 
-// Добавляем символ '$' к цене, если она задана
+
+// Appends price with '$' if price exists
 function insertItemPrice(html,
                          pricePropName,
                          priceValue) {
-  // Если цена не задана, заменяем на пустую строку
+  // If not specified, replace with empty string
   if (!priceValue) {
     return insertProperty(html, pricePropName, "");
   }
@@ -279,11 +332,12 @@ function insertItemPrice(html,
   return html;
 }
 
-// Добавляем размер порции, если он задан
+
+// Appends portion name in parens if it exists
 function insertItemPortionName(html,
                                portionPropName,
                                portionValue) {
-  // Если размер порции не задан, заменяем на пустую строку
+  // If not specified, return original string
   if (!portionValue) {
     return insertProperty(html, portionPropName, "");
   }
@@ -292,6 +346,7 @@ function insertItemPortionName(html,
   html = insertProperty(html, portionPropName, portionValue);
   return html;
 }
+
 
 global.$dc = dc;
 
