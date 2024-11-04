@@ -105,3 +105,4 @@ dc.loadMenuItems = function (categoryShort) {
 global.$dc = dc;
 
 })(window);
+ 
